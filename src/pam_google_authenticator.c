@@ -58,6 +58,8 @@
 #define CODE_PROMPT   "Verification code: "
 #define PWCODE_PROMPT "Password & verification code: "
 
+#define CODE_LEN (10000*10000) // Eight digits
+
 typedef struct Params {
   const char *secret_filename_spec;
   const char *authtok_prompt;
@@ -1280,7 +1282,7 @@ int compute_code(const uint8_t *secret, int secretLen, unsigned long value) {
   }
   explicit_bzero(hash, sizeof(hash));
   truncatedHash &= 0x7FFFFFFF;
-  truncatedHash %= 1000000;
+  truncatedHash %= CODE_LEN;
   return truncatedHash;
 }
 
@@ -1431,7 +1433,7 @@ static int check_timebased_code(pam_handle_t *pamh, const char*secret_filename,
     return 1;
   }
 
-  if (code < 0 || code >= 1000000) {
+  if (code < 0 || code >= CODE_LEN) {
     // All time based verification codes are no longer than six digits.
     return 1;
   }
